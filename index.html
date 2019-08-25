@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <link
+            rel="stylesheet"
+            href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+            integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+            crossorigin="anonymous"
+        />
+        <title>Ghipy API HW</title>
+    </head>
+    <body>
+        <div class="row">
+            <div class="col">
+                <div class="jumbotron py-2">
+                    <h1 class="display-3">GHIPY API HW</h1>
+                    <hr class="my-2" />
+                    <p class="lead">
+                        Anya Keller's GIFY HW
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="row my-4">
+            <div class="col">
+                <div class="card">
+                    <h5 class="card-header">
+                        <!-- Rendered Buttons will get Dumped Here  -->
+                        <div id="buttons-view"></div>
+
+                        <form id="movie-form" class="my-2">
+                            <label for="search-input">Add a GIF</label>
+                            <input type="text" id="search-input" />
+                            <br />
+
+                            <!-- Button triggers new movie to be added -->
+                            <input
+                                class="btn btn-success"
+                                id="add-search"
+                                type="submit"
+                                value="Add a GIF query"
+                            />
+                        </form>
+                    </h5>
+                    <div class="card-body">
+                        <div id="gif-view"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="scripts">
+            <!-- Jquerey -->
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+            <!-- Popper -->
+            <script
+                src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+                integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+                crossorigin="anonymous"
+            ></script>
+            <!-- bootstrap js -->
+            <script
+                src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+                integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+                crossorigin="anonymous"
+            ></script>
+            <script>
+                // Honestly I copy pasted a lot of this code from class activities
+                var searches = ["cat", "bird", "dog", "potato"];
+
+                // display gifs
+                function displayGIFS() {
+                    $("#gif-view").empty();
+                    var gifQuery = $(this).attr("data-name");
+                    var queryURL =
+                        "https://api.giphy.com/v1/gifs/search?q=" +
+                        gifQuery +
+                        "&api_key=EYkLT3ZhujrN013VIbv6amEBKBkTv1LL";
+
+                    $.ajax({
+                        url: queryURL,
+                        method: "GET"
+                    }).then(function(response) {
+                        var results = response.data;
+                        // ========================
+
+                        for (var i = 0; i < results.length; i++) {
+                            var gifDiv = $("<div>");
+                            gifDiv.css({
+                                display: "inline-block",
+                                margin: "5px 10px"
+                            });
+                            var p = $("<p>");
+                            p.text(results[i].rating);
+
+                            var animalImage = $("<img>").attr(
+                                "src",
+                                results[i].images.fixed_height.url
+                            );
+                            gifDiv.append(p);
+                            gifDiv.append(animalImage);
+                            $("#gif-view").prepend(gifDiv);
+                        }
+                    });
+                }
+
+                function renderButtons() {
+                    $("#buttons-view").empty();
+
+                    for (var i = 0; i < searches.length; i++) {
+                        var a = $("<button>");
+                        a.addClass(
+                            "btn btn-info category-btn mx-1 my-1 btn-sm"
+                        );
+                        a.attr("type", "button");
+                        a.attr("data-name", searches[i]);
+                        a.text(searches[i]);
+                        $("#buttons-view").append(a);
+                    }
+                }
+
+                // when add search is clicked
+                $("#add-search").on("click", function(event) {
+                    event.preventDefault();
+                    var searchgif = $("#search-input")
+                        .val()
+                        .trim();
+
+                    searches.push(searchgif);
+
+                    renderButtons();
+                });
+
+                $(document).on("click", ".category-btn", displayGIFS);
+                renderButtons();
+            </script>
+        </div>
+    </body>
+</html>
